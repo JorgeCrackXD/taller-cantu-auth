@@ -1,2 +1,2 @@
-# taller-cantu-api
-This is gonna be the Backend API for the taller cantu webpage
+# taller-cantu-auth
+This is gonna be the users AUTH microservice of Taller Cantu Infraestructure

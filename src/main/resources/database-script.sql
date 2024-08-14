@@ -18,6 +18,7 @@ CREATE TABLE users (
         REFERENCES user_role (id)
 );
 
+/*
 CREATE TABLE phone_number (
 	id SERIAL PRIMARY KEY,
 	number INTEGER NOT NULL,
@@ -99,5 +100,5 @@ CREATE TABLE product (
         FOREIGN KEY (product_brand_id)
         REFERENCES product_brand (id)
 );
-
+*/
 

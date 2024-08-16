@@ -5,8 +5,9 @@ CREATE TABLE user_role (
     update_datetime TIMESTAMP
 );
 
+
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -17,6 +18,9 @@ CREATE TABLE users (
         FOREIGN KEY (role_id)
         REFERENCES user_role (id)
 );
+
+
+INSERT INTO user_role (name, creation_datetime) VALUES ('ADMINISTRATOR', NOW());
 
 /*
 CREATE TABLE phone_number (

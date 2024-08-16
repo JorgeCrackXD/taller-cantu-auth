@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -17,9 +20,10 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    @UuidGenerator
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @Column(name = "first_name", length = 100, nullable = false)
     private String first_name;
@@ -35,6 +39,9 @@ public class User {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "birth_date", nullable = false)
+    private LocalDateTime birth_date;
 
     @Column(name = "creation_datetime", nullable = false)
     private LocalDateTime creation_datetime;

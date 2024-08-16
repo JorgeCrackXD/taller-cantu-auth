@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.cantu</groupId>
-	<artifactId>taller.web.back</artifactId>
+	<artifactId>taller-cantu-auth</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>taller.web.back</name>
-	<description>API Backend para lla Web App del Taller Cantú</description>
+	<name>taller-cantu-auth</name>
+	<description>API Backend para la autenticación de Usuarios</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -53,6 +53,20 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>3.1.1</version>
 		</dependency>
 	</dependencies>
 

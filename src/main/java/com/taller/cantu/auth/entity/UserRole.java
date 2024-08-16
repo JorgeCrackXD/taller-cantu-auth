@@ -1,4 +1,4 @@
-package com.cantu.taller.web.back.entity;
+package com.taller.cantu.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
-public class User {
+@Table(name = "user_role")
+public class UserRole {
 
     @Id
     @Column(name = "id")
@@ -24,21 +24,11 @@ public class User {
     @Column(name = "name", length = 100, nullable = false)
     private String name;
 
-    @Column(name = "email", length = 100, nullable = false)
-    private String email;
-
-    @Column(name = "password", nullable = false)
-    private String password;
-
     @Column(name = "creation_datetime", nullable = false)
     private LocalDateTime creation_datetime;
 
     @Column(name = "update_datetime")
     private LocalDateTime update_datetime;
-
-    @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false)
-    private UserRole role;
 
     @PrePersist
     protected void onCreate() {

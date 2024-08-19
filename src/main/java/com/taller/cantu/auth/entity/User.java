@@ -31,10 +31,10 @@ public class User {
     @Column(name = "last_name", length = 100, nullable = false)
     private String last_name;
 
-    @Column(name = "full_name", length = 100, nullable = false)
+    @Column(name = "full_name", length = 200, nullable = false)
     private String full_name;
 
-    @Column(name = "email", length = 100, nullable = false)
+    @Column(name = "email", length = 100, nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false)
@@ -42,6 +42,12 @@ public class User {
 
     @Column(name = "birth_date", nullable = false)
     private LocalDateTime birth_date;
+
+    @Column(name = "verified", nullable = false)
+    private boolean verified;
+
+    @Column(name = "blocked", nullable = false)
+    private boolean blocked;
 
     @Column(name = "creation_datetime", nullable = false)
     private LocalDateTime creation_datetime;

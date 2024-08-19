@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -25,7 +27,7 @@ public class UserRegisterDTO {
     private String full_name;
 
     @NotNull(message = "Parameter 'birth_date' is required")
-    private Date birth_date;
+    private LocalDateTime birth_date;
 
     @NotEmpty(message = "Parameter 'email' is required")
     private String email;

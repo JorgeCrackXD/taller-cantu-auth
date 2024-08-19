@@ -8,4 +8,6 @@ import org.springframework.stereotype.Service;
 public interface UserService {
 
     public GlobalResponse registerUser(UserRegisterDTO userRegisterDTO);
+
+    public GlobalResponse activateUser(String email, String code);
 }

@@ -1,12 +1,17 @@
 package com.taller.cantu.auth.config;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class BeansConfig {
+
+    @Value("${taller.cantu.gateway.url}")
+    private String addressBaseUrl;
 
     @Bean
     public ModelMapper modelMapper() {
@@ -16,5 +21,10 @@ public class BeansConfig {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public WebClient webClient() {
+        return WebClient.builder().baseUrl(addressBaseUrl).build();
     }
 }

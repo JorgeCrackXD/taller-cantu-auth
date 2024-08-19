@@ -8,9 +8,14 @@ CREATE TABLE user_role (
 
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+	last_name VARCHAR(100) NOT NULL,
+    full_name VARCHAR(200) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+	birth_date TIMESTAMP NOT NULL,
+	verified BOOLEAN NOT NULL DEFAULT FALSE,
+	blocked BOOLEAN NOT NULL DEFAULT FALSE,
     creation_datetime TIMESTAMP NOT NULL,
     update_datetime TIMESTAMP,
     role_id INTEGER NOT NULL,
@@ -21,6 +26,14 @@ CREATE TABLE users (
 
 
 INSERT INTO user_role (name, creation_datetime) VALUES ('ADMINISTRATOR', NOW());
+
+CREATE TABLE email_verification_token (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    token_expiration TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
 
 /*
 CREATE TABLE phone_number (

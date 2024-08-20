@@ -1,6 +1,7 @@
 package com.taller.cantu.auth.controller;
 
 import com.taller.cantu.auth.dto.GlobalResponse;
+import com.taller.cantu.auth.dto.UserActivationDTO;
 import com.taller.cantu.auth.dto.UserRegisterDTO;
 import com.taller.cantu.auth.exception.BusinessException;
 import com.taller.cantu.auth.service.UserService;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -38,9 +41,9 @@ public class UserController {
     }
 
     @PostMapping("/activate")
-    public ResponseEntity<GlobalResponse> activateUser(@RequestParam String email, @RequestParam String code) {
+    public ResponseEntity<GlobalResponse> activateUser(@Valid @RequestBody UserActivationDTO userActivationDTO) {
         try {
-            GlobalResponse response = userService.activateUser(email, code);
+            GlobalResponse response = userService.activateUser(userActivationDTO);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception ex) {
             GlobalResponse exceptionResponse;

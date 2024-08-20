@@ -2,14 +2,18 @@ package com.taller.cantu.auth.service.impl;
 
 import com.taller.cantu.auth.dto.ErrorDTO;
 import com.taller.cantu.auth.dto.GlobalResponse;
+import com.taller.cantu.auth.dto.UserActivationDTO;
 import com.taller.cantu.auth.dto.UserRegisterDTO;
 import com.taller.cantu.auth.entity.User;
 import com.taller.cantu.auth.exception.BusinessException;
 import com.taller.cantu.auth.repository.UserRepository;
 import com.taller.cantu.auth.repository.UserRoleRepository;
+import com.taller.cantu.auth.service.EmailVerificationTokenService;
 import com.taller.cantu.auth.service.UserService;
 import com.taller.cantu.auth.service.WebClientService;
 import com.taller.cantu.auth.utils.RegexUtils;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -39,8 +44,15 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private WebClientService webClientService;
 
+    @Autowired
+    private EmailVerificationTokenService emailVerificationTokenService;
+
+    @Autowired
+    private EntityManager entityManager;
+
     @Override
-    public GlobalResponse registerUser(UserRegisterDTO userRegisterDTO) {
+    @Transactional
+    public GlobalResponse registerUser(UserRegisterDTO userRegisterDTO) throws Exception {
         RegexUtils.isValidEmail(userRegisterDTO.getEmail());
         this.validateNewUserRegistration(userRegisterDTO.getEmail());
 
@@ -56,12 +68,25 @@ public class UserServiceImpl implements UserService {
         User user = modelMapper.map(userRegisterDTO, User.class);
         user.setRole(userRoleRepository.findById(1L).orElse(null));
 
+        //SAVE USER TO DATABASE
+        user = userRepository.save(user);
+
+        //GENERATE ACTIVATION CODE
+        String activationToken = emailVerificationTokenService.generateEmailVerificationToken(user);
+
         //HERE WE SHOULD SEND EMAIL TO USER TO VERIFY HIS EMAIL
-        this.sendRegistrationEmail(user.getEmail());
+        this.sendRegistrationEmail(user, activationToken);
         log.info("Email notification sent to microservice to be delivered to user");
 
-        user = userRepository.save(user);
         return new GlobalResponse("User registered successfully, awaiting for activation.", user, null);
+    }
+
+    @Override
+    public GlobalResponse activateUser(UserActivationDTO userActivationDTO) {
+        User user = userRepository.findById(userActivationDTO.getUser_id()).orElse(null);
+
+
+        return null;
     }
 
     private String hashPassword(String password) {
@@ -72,7 +97,7 @@ public class UserServiceImpl implements UserService {
         return passwordEncoder.matches(password, passwordHash);
     }
 
-    private void sendRegistrationEmail(String email) {
+    private void sendRegistrationEmail(User user, String activationToken) {
         Mono<String> response = webClientService.sendGetRequest("");
 
         // Procesar la respuesta de manera asíncrona
@@ -101,5 +126,7 @@ public class UserServiceImpl implements UserService {
             log.info("Deleting non verified users with email {}", email);
             userRepository.deleteAll(nonVerifiedUsers);
         }
+        entityManager.flush();
     }
+
 }

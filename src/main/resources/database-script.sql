@@ -30,9 +30,11 @@ INSERT INTO user_role (name, creation_datetime) VALUES ('ADMINISTRATOR', NOW());
 CREATE TABLE email_verification_token (
     id SERIAL PRIMARY KEY,
     user_id UUID NOT NULL,
-    token VARCHAR(255) NOT NULL,
-    token_expiration TIMESTAMP NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    token TEXT NOT NULL,
+    expiration_datetime TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+	creation_datetime TIMESTAMP NOT NULL,
+    update_datetime TIMESTAMP
 );
 
 /*

@@ -1,5 +1,6 @@
 package com.taller.cantu.auth.config;
 
+import com.taller.cantu.auth.filter.JwtFilter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

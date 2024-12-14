@@ -1,6 +1,8 @@
 package com.taller.cantu.auth.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserActivationDTO {
 
-    @NotEmpty(message = "Parameter 'user_id' is required")
+    @NotNull(message = "Parameter 'user_id' is required")
     private UUID user_id;
 
     @NotEmpty(message = "Parameter 'code' is required")

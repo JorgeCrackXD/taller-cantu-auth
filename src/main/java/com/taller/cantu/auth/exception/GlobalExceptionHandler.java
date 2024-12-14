@@ -33,4 +33,16 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<GlobalResponse> handleUnexptectedErrors(Exception ex) {
+        GlobalResponse response = new GlobalResponse();
+        response.setMessage("Unexpected Internal Server Error.");
+        response.setErrors(new ArrayList<>());
+
+        ErrorDTO errorDTO = new ErrorDTO("NO CODE.", ex.getMessage());
+        response.getErrors().add(errorDTO);
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

@@ -4,8 +4,10 @@ import com.taller.cantu.auth.dto.ErrorDTO;
 import com.taller.cantu.auth.dto.GlobalResponse;
 import com.taller.cantu.auth.dto.UserActivationDTO;
 import com.taller.cantu.auth.dto.UserRegisterDTO;
+import com.taller.cantu.auth.entity.EmailVerificationToken;
 import com.taller.cantu.auth.entity.User;
 import com.taller.cantu.auth.exception.BusinessException;
+import com.taller.cantu.auth.repository.EmailVerificationTokenRepository;
 import com.taller.cantu.auth.repository.UserRepository;
 import com.taller.cantu.auth.repository.UserRoleRepository;
 import com.taller.cantu.auth.service.EmailVerificationTokenService;
@@ -22,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +40,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRoleRepository userRoleRepository;
+
+    @Autowired
+    private EmailVerificationTokenRepository emailVerificationTokenRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -84,9 +90,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public GlobalResponse activateUser(UserActivationDTO userActivationDTO) {
         User user = userRepository.findById(userActivationDTO.getUser_id()).orElse(null);
+        if(user == null) {
+            throw new BusinessException("Token is invalid.");
+        }
 
+        EmailVerificationToken token = emailVerificationTokenRepository.findByTokenAndUser(userActivationDTO.getUser_id(), userActivationDTO.getCode()).orElse(null);
+        if(token == null) {
+            throw new BusinessException("Token is invalid.");
+        }
 
-        return null;
+        if(!validateEmailToken(token)) {
+            //Delete the token because is expired.
+            emailVerificationTokenRepository.delete(token);
+
+            throw new BusinessException("The Activation Token is expired, it will be deleted, you have to generate new one.");
+        }
+
+        // All validations ok, lets activate the user hehe.
+        user.setBlocked(false);
+        user.setVerified(true);
+        userRepository.save(user);
+        return new GlobalResponse("User activated successfully.", null, null);
     }
 
     private String hashPassword(String password) {
@@ -127,6 +151,10 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteAll(nonVerifiedUsers);
         }
         entityManager.flush();
+    }
+
+    private boolean validateEmailToken(EmailVerificationToken token) {
+        return token.getExpiration_datetime().isAfter(LocalDateTime.now());
     }
 
 }

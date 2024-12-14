@@ -2,6 +2,7 @@ package com.taller.cantu.auth.controller;
 
 import com.taller.cantu.auth.dto.GlobalResponse;
 import com.taller.cantu.auth.dto.UserActivationDTO;
+import com.taller.cantu.auth.dto.UserLoginDTO;
 import com.taller.cantu.auth.dto.UserRegisterDTO;
 import com.taller.cantu.auth.exception.BusinessException;
 import com.taller.cantu.auth.service.UserService;
@@ -49,6 +50,23 @@ public class UserController {
             GlobalResponse exceptionResponse;
             if (ex instanceof BusinessException businessException) {
                 exceptionResponse = ResponseUtils.buildExceptionResponse(businessException, "Error activating user");
+                return new ResponseEntity<>(exceptionResponse, businessException.getHttpStatus());
+            }
+            log.error("Error activating user", ex);
+            exceptionResponse = ResponseUtils.buildExceptionResponse(ex, "Error activating user");
+            return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<GlobalResponse> authenticate(@Valid @RequestBody UserLoginDTO userLoginDTO) {
+        try {
+            GlobalResponse response = userService.loginUser(userLoginDTO);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception ex) {
+            GlobalResponse exceptionResponse;
+            if (ex instanceof BusinessException businessException) {
+                exceptionResponse = ResponseUtils.buildExceptionResponse(businessException, "Error trying to login.");
                 return new ResponseEntity<>(exceptionResponse, businessException.getHttpStatus());
             }
             log.error("Error activating user", ex);

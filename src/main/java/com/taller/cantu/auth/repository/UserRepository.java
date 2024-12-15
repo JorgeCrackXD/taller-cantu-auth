@@ -18,4 +18,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query(value = "SELECT * FROM users WHERE email = :email AND verified = false", nativeQuery = true)
     List<User> findByEmailAndNonVerified(@Param("email") String email);
+
+    @Query(value = "SELECT * FROM users WHERE email = :email AND verified = true", nativeQuery = true)
+    Optional<User> findByEmailAndVerified(@Param("email") String email);
+
+    @Query(value = "SELECT password FROM users WHERE email = :email LIMIT 1", nativeQuery = true)
+    Optional<String> findPasswordByEmail(@Param("email") String email);
 }

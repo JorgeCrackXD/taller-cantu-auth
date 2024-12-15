@@ -1,9 +1,6 @@
 package com.taller.cantu.auth.service.impl;
 
-import com.taller.cantu.auth.dto.ErrorDTO;
-import com.taller.cantu.auth.dto.GlobalResponse;
-import com.taller.cantu.auth.dto.UserActivationDTO;
-import com.taller.cantu.auth.dto.UserRegisterDTO;
+import com.taller.cantu.auth.dto.*;
 import com.taller.cantu.auth.entity.EmailVerificationToken;
 import com.taller.cantu.auth.entity.User;
 import com.taller.cantu.auth.exception.BusinessException;
@@ -11,6 +8,7 @@ import com.taller.cantu.auth.repository.EmailVerificationTokenRepository;
 import com.taller.cantu.auth.repository.UserRepository;
 import com.taller.cantu.auth.repository.UserRoleRepository;
 import com.taller.cantu.auth.service.EmailVerificationTokenService;
+import com.taller.cantu.auth.service.JwtService;
 import com.taller.cantu.auth.service.UserService;
 import com.taller.cantu.auth.service.WebClientService;
 import com.taller.cantu.auth.utils.RegexUtils;
@@ -26,6 +24,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -52,6 +51,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private EmailVerificationTokenService emailVerificationTokenService;
+
+    @Autowired
+    private JwtService jwtService;
 
     @Autowired
     private EntityManager entityManager;
@@ -111,6 +113,32 @@ public class UserServiceImpl implements UserService {
         user.setVerified(true);
         userRepository.save(user);
         return new GlobalResponse("User activated successfully.", null, null);
+    }
+
+    @Override
+    public GlobalResponse loginUser(UserLoginDTO userLoginDTO) throws Exception {
+        RegexUtils.isValidEmail(userLoginDTO.getEmail());
+
+        String hashedPassword = userRepository.findPasswordByEmail(userLoginDTO.getEmail()).orElse("");
+
+        if(hashedPassword.isEmpty()) {
+            throw new BusinessException("Invalid Credentials, try again.");
+        }
+
+        if(!checkPassword(userLoginDTO.getPassword(), hashedPassword)) {
+            throw new BusinessException("Invalid Credentials, try again.");
+        }
+
+        Optional<User> loggedUser = userRepository.findByEmailAndVerified(userLoginDTO.getEmail());
+        if(loggedUser.isEmpty()){
+            throw new BusinessException("User is not verified, please check your confirmation email.");
+        }
+
+        // Generar el token
+        String token = jwtService.generateJwtToken(loggedUser.get());
+
+        LoginSuccessDTO loginSuccessDTO = new LoginSuccessDTO("JWT", "3600", token);
+        return new GlobalResponse("Login success.", loginSuccessDTO, null);
     }
 
     private String hashPassword(String password) {

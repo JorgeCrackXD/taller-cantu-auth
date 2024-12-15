@@ -13,10 +13,12 @@ import com.taller.cantu.auth.service.UserService;
 import com.taller.cantu.auth.service.WebClientService;
 import com.taller.cantu.auth.utils.RegexUtils;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.query.AbstractJpaQuery;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -139,6 +142,21 @@ public class UserServiceImpl implements UserService {
 
         LoginSuccessDTO loginSuccessDTO = new LoginSuccessDTO("JWT", "3600", token);
         return new GlobalResponse("Login success.", loginSuccessDTO, null);
+    }
+
+    @Override
+    public GlobalResponse blockUser(String email, boolean blocked) {
+        RegexUtils.isValidEmail(email);
+
+        if(userRepository.findByEmailAndVerified(email).isEmpty()) {
+            throw new BusinessException("The user your are trying to block don't exists.");
+        }
+
+        UserBlockedDTO userBlocked = modelMapper.map(userRepository.blockUser(email, blocked), UserBlockedDTO.class);
+        if(userBlocked == null) {
+            throw new BusinessException("Error trying to block the user.");
+        }
+        return new GlobalResponse("User updated successfully.", userBlocked, null);
     }
 
     private String hashPassword(String password) {

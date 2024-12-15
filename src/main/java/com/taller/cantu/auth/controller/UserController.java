@@ -66,11 +66,28 @@ public class UserController {
         } catch (Exception ex) {
             GlobalResponse exceptionResponse;
             if (ex instanceof BusinessException businessException) {
-                exceptionResponse = ResponseUtils.buildExceptionResponse(businessException, "Error trying to login.");
+                exceptionResponse = ResponseUtils.buildExceptionResponse(businessException, "Error trying to log in.");
                 return new ResponseEntity<>(exceptionResponse, businessException.getHttpStatus());
             }
-            log.error("Error activating user", ex);
-            exceptionResponse = ResponseUtils.buildExceptionResponse(ex, "Error activating user");
+            log.error("Error trying to log in", ex);
+            exceptionResponse = ResponseUtils.buildExceptionResponse(ex, "Error trying to log in");
+            return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/block")
+    public ResponseEntity<GlobalResponse> blockUser(@RequestParam String email, @RequestParam boolean blocked) {
+        try {
+            GlobalResponse response = userService.blockUser(email, blocked);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception ex) {
+            GlobalResponse exceptionResponse;
+            if (ex instanceof BusinessException businessException) {
+                exceptionResponse = ResponseUtils.buildExceptionResponse(businessException, "Error trying to block the user.");
+                return new ResponseEntity<>(exceptionResponse, businessException.getHttpStatus());
+            }
+            log.error("Error trying to block user.", ex);
+            exceptionResponse = ResponseUtils.buildExceptionResponse(ex, "Error trying to log in.");
             return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

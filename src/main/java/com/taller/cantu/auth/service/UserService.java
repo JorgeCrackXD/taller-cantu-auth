@@ -16,4 +16,6 @@ public interface UserService {
     public GlobalResponse activateUser(UserActivationDTO userActivationDTO);
 
     public GlobalResponse loginUser(UserLoginDTO userLoginDTO) throws Exception;
+
+    public GlobalResponse blockUser(String email, boolean blocked);
 }
